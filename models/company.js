@@ -60,6 +60,55 @@ class Company {
            ORDER BY name`);
     return companiesRes.rows;
   }
+  
+  /** Find all companies within the filtered parameters set
+   *  
+   *  Doesn't use parameters that arent given (that is, it won't search using number 
+   *  of employees if min or max employee filter is not given)
+   */
+
+  static async filterFind(queries) {
+
+    // Constructs the WHERE part of the SQL query that contains only the parameters
+    // included in the query string.
+    let whereQuery = "";
+    for (let filter in queries) {
+      let toConcat;
+      if (filter == "name") {
+        toConcat = `${filter} ILIKE '%${queries[filter]}%'`
+      } else if (filter == "minEmployees") {
+        toConcat = `num_employees >= ${queries[filter]}`
+      } else if (filter == "maxEmployees") {
+        toConcat = `num_employees <= ${queries[filter]}`
+      }
+      whereQuery = whereQuery.concat(toConcat);
+
+      // Deletes iterated property from query object after use, 
+      // then checks the object to see if there are any more keys that need
+      // to be included in the WHERE clause.
+      delete queries[filter];
+      if (Object.keys(queries).length > 0) {
+        whereQuery = whereQuery.concat(" AND ")
+      }
+    }
+
+    // Made this its own variable to be able to print it in troubleshooting.
+    const query =
+    `SELECT 
+    handle,
+    name,
+    description,
+    num_employees AS "numEmployees",
+    logo_url AS "logoUrl"
+    FROM companies
+    WHERE ${whereQuery}
+    ORDER BY name`;
+
+    console.log(query)
+    const companiesRes = await db.query(query)
+
+    return companiesRes.rows;
+  }
 
   /** Given a company handle, return data about company.
    *

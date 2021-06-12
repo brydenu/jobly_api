@@ -108,6 +108,29 @@ describe("GET /companies", function () {
   });
 });
 
+test("works with queries", async function() {
+  const resp = await request(app).get("/companies?name=c&minEmployees=1&maxEmployees=2");
+  expect(resp.body).toEqual({
+    companies:
+        [
+          {
+            handle: "c1",
+            name: "C1",
+            description: "Desc1",
+            numEmployees: 1,
+            logoUrl: "http://c1.img",
+          },
+          {
+            handle: "c2",
+            name: "C2",
+            description: "Desc2",
+            numEmployees: 2,
+            logoUrl: "http://c2.img",
+          },
+        ],
+  });
+})
+
 /************************************** GET /companies/:handle */
 
 describe("GET /companies/:handle", function () {
