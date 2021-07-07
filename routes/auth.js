@@ -17,6 +17,8 @@ const { BadRequestError } = require("../expressError");
  * Returns JWT token which can be used to authenticate further requests.
  *
  * Authorization required: none
+ * 
+ * This is similar to a login route.
  */
 
 router.post("/token", async function (req, res, next) {
@@ -62,5 +64,16 @@ router.post("/register", async function (req, res, next) {
   }
 });
 
+// router.post("/adminreg", async function (req, res, next) {
+//   try {
+//     const validator  = jsonschema.validate(req.body, userRegisterSchema);
+//     if (!validator.valid) {
+//       const errs = validator.errors.map(e => e.stack);
+//       throw new BadRequestError(errs);
+//     }
+
+//     const newAdmin = await User.register
+//   }
+// })
 
 module.exports = router;
