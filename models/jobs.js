@@ -115,7 +115,8 @@ class Jobs {
    * This is a "partial update" --- it's fine if data doesn't contain all the
    * fields; this only changes provided ones.
    *
-   * Data can include: {title, salary, equity, company_handle}
+   * Data can include: {title, salary, equity}
+   * (Note: ID and company can NOT be changed)
    *
    * Returns {id, title, salary, equity, company_handle}
    *
@@ -123,7 +124,29 @@ class Jobs {
    */
 
   static async update(id, data) {
-      const {set}
+    // Since company_handle is the only nonSQL-ized term (and not changeable), 
+    // we will just input an empty object.
+      const {setCols, values} = sqlForPartialUpdate(data, {});
+
+      const idVarIdx = "$" + (values.length + 1);
+
+      const querySql = 
+      `UPDATE jobs
+      SET ${setCols}
+      WHERE id = ${idVarIdx}
+      RETURNING id,
+      title,
+      salary,
+      equity,
+      company_handle AS "companyHandle"
+      `;
+      
+      const res = await db.query(querySql, [...values, id]);
+      const job = res.rows[0];
+
+      if (!job) throw new NotFoundError(`No job with id: "${id}"`);
+
+      return job;
   }
 
   /** DELETE

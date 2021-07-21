@@ -63,7 +63,7 @@ describe("ensureLoggedIn", function () {
   test("works", function () {
     expect.assertions(1);
     const req = {};
-    const res = { locals: { user: { username: "test", is_admin: false } } };
+    const res = { locals: { user: { username: "test", isAdmin: false } } };
     const next = function (err) {
       expect(err).toBeFalsy();
     };
@@ -85,7 +85,7 @@ describe("ensureAdmin", function() {
   test("works", function() {
     expect.assertions(1);
     const req = {};
-    const res = { locals: { user: { username: "test", is_admin:  true } } };
+    const res = { locals: { user: { username: "test", isAdmin:  true } } };
     const next = function (err) {
       expect(err).toBeFalsy();
     };
@@ -95,7 +95,7 @@ describe("ensureAdmin", function() {
   test("unauth if not admin", function() {
     expect.assertions(1);
     const req = {};
-    const res = { locals: { user: { username: "test", is_admin:  false } } };
+    const res = { locals: { user: { username: "test", isAdmin:  false } } };
     const next = function (err) {
       expect(err instanceof UnauthorizedError).toBeTruthy();
     };
@@ -117,7 +117,7 @@ describe("ensureAuthorized", function () {
   test("works: is admin", function() {
     expect.assertions(1);
     const req = { params: { username: "testUsername" }};
-    const res = { locals: { user: { username: "test", is_admin:  true } } };
+    const res = { locals: { user: { username: "test", isAdmin:  true } } };
     const next = function (err) {
       expect(err).toBeFalsy();
     };
@@ -127,7 +127,7 @@ describe("ensureAuthorized", function () {
   test("works: is correct user", function() {
     expect.assertions(1);
     const req = { params: { username: "specialTestUser1234567" }};
-    const res = { locals: { user: { username: "specialTestUser1234567", is_admin:  false } } };
+    const res = { locals: { user: { username: "specialTestUser1234567", isAdmin:  false } } };
     const next = function (err) {
       expect(err).toBeFalsy();
     };
@@ -137,7 +137,7 @@ describe("ensureAuthorized", function () {
   test("unauth if not admin or correct user", function() {
     expect.assertions(1);
     const req = { params: { username: "testUsername" }};
-    const res = { locals: { user: { username: "test", is_admin:  false } } };
+    const res = { locals: { user: { username: "test", isAdmin:  false } } };
     const next = function (err) {
       expect(err instanceof UnauthorizedError).toBeTruthy();
     };

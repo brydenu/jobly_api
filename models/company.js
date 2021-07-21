@@ -149,13 +149,17 @@ class Company {
    */
 
   static async update(handle, data) {
+    console.log("START OF Company.update(handle, data)".red)
+    console.log("THIS IS THE DATA!!!!!!!!!!!!: ".red, data)
     const { setCols, values } = sqlForPartialUpdate(
         data,
         {
           numEmployees: "num_employees",
           logoUrl: "logo_url",
         });
+    console.log("BACK TO Company.update(handle, data)".red)
     const handleVarIdx = "$" + (values.length + 1);
+    console.log("handleVarIdx: ".blue, handleVarIdx)
 
     const querySql = `UPDATE companies 
                       SET ${setCols} 
@@ -165,8 +169,10 @@ class Company {
                                 description, 
                                 num_employees AS "numEmployees", 
                                 logo_url AS "logoUrl"`;
+    console.log("querySql: ".red, querySql)
     const result = await db.query(querySql, [...values, handle]);
     const company = result.rows[0];
+    console.log("company: ".blue, company)
 
     if (!company) throw new NotFoundError(`No company: ${handle}`);
 
