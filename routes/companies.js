@@ -8,7 +8,7 @@ const express = require("express");
 const { BadRequestError } = require("../expressError");
 const { ensureLoggedIn, ensureAdmin } = require("../middleware/auth");
 const Company = require("../models/company");
-const helpers = require("../helpers/companiesHelpers")
+const helpers = require("../helpers/helpers")
 
 const companyNewSchema = require("../schemas/companyNew.json");
 const companyUpdateSchema = require("../schemas/companyUpdate.json");

@@ -1,4 +1,4 @@
-const {validateQueries} = require("./companiesHelpers");
+const {validateQueries} = require("./helpers");
 const { BadRequestError } = require("../expressError");
 
 describe("validateQueries works if using proper queries in any combination", function() {

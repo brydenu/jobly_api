@@ -6,12 +6,12 @@ const { sqlForPartialUpdate } = require("../helpers/sql");
 
 /** Related functions for jobs. */
 
-class Jobs {
+class Job {
   /** Create a job (from data), update db, return new job data.
    *
-   * data should be { title, salary, equity, company_handle }
+   * data should be { title, salary, equity, companyHandle }
    *
-   * Returns { id, title, salary, equity, company_handle }
+   * Returns { id, title, salary, equity, companyHandle }
    *
    * */
 
@@ -20,7 +20,7 @@ class Jobs {
           `INSERT INTO jobs
           (title, salary, equity, company_handle)
           VALUES ($1, $2, $3, $4, $5)
-          RETURNING id, title, salary, equity, company_handle`,
+          RETURNING id, title, salary, equity, company_handle AS companyHandle`,
           [title, salary, equity, company_handle]
       );
       const job = result.rows[0];
