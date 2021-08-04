@@ -52,9 +52,9 @@ router.post("/", ensureAdmin, async function (req, res, next) {
  */
 
 router.get("/", async function (req, res, next) {
-  console.log("=========================")
   try {
-    const queries = helpers.validateQueries(req.query);
+    console.log(req.originalUrl)
+    const queries = helpers.validateQueries(req.query, req.originalUrl.substring(1,10));
     let companies;
     if (queries) {
       companies = await Company.filterFind(queries)

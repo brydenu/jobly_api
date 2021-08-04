@@ -11,60 +11,73 @@ const { BadRequestError } = require("../expressError");
 *   Also makes sure that minEmployees never exceeds maxEmployees.
 */
 
-function validateQueries(queries) {
-    let name;
-    let minEmployees;
-    let maxEmployees;
-    const filters = {};
-
-    // If there aren't any keys in the queries object then we don't have to do anything, 
-    // so check that here.
-    //
-    // If it does find keys, try to match the key names to one of the 3 appropriate filters
-    // and if the key matches, save the key-value pair to the filters object.
-    //
-    // If the key does not match either of the 3 appropriate keys, it is an invalid key name
-    // so we throw a BadRequestError.
-    //
-    // (Also makes sure the values passed into either min/max Employees is a number and not anything else.)
-    if (Object.keys(queries).length > 0) {
+function validateQueries(queries, location=null) {
+  // If there aren't any keys in the queries object then we don't have to do anything, 
+  // so check that here.
+  //
+  // If it does find keys, try to match the key names to one of the 3 appropriate filters
+  // and if the key matches, save the key-value pair to the filters object.
+  //
+  // If the key does not match either of the 3 appropriate keys, it is an invalid key name
+  // so we throw a BadRequestError.
+  //
+  // (Also makes sure the values passed into either min/max Employees is a number and not anything else.)
+  const filters = {};
+    
+  if (Object.keys(queries).length > 0) {
+    // First check to see if filter is coming from a request to /companies or /jobs
+    if (location == "companies") {
       if (queries.name) {
         filters.name = queries.name;
         delete queries.name;
       }
       if (queries.minEmployees) {
-        minEmployees = parseInt(queries.minEmployees);
-        if (!minEmployees) {
+        filters.minEmployees = parseInt(queries.minEmployees);
+        if (!filters.minEmployees) {
             throw new BadRequestError("Min Employees query must be a number")
         }
-        filters.minEmployees = minEmployees;
         delete queries.minEmployees;
       }
       if (queries.maxEmployees) {
-        maxEmployees = parseInt(queries.maxEmployees);
-        if (!maxEmployees) {
+        filters.maxEmployees = parseInt(queries.maxEmployees);
+        if (!filters.maxEmployees) {
             throw new BadRequestError("Max Employees query must be a number")
         }
-        filters.maxEmployees = maxEmployees;
         delete queries.maxEmployees;
       }
+      // If there are queries remaining (therefore invalid queries)
       if (Object.keys(queries).length > 0) {
           throw new BadRequestError(
-              `Invalid filter(s): Only name, minEmployees, and maxEmployees permitted in query string.\nInvalid queries: ${Object.keys(queries)}`)
+              `Invalid filter(s): ${Object.keys(queries)}`)
       }
+      // The if logic for the request being to /jobs
     } else {
-      // Branches to this if there are no keys at all.
-        return false;
+      if (queries.title) {
+        filters.title = queries.title;
+        delete queries.title;
+      }
+      if (queries.minSalary) {
+        filters.minSalary = queries.minSalary;
+        delete queries.minSalary;
+      }
+      if (Object.keys(queries).includes("hasEquity")) {
+        if (queries.hasEquity == "true") {
+          filters.hasEquity = "> 0";
+        } else {
+          filters.hasEquity = "= 0";
+        }
+        delete queries.hasEquity;
+      }
+
     }
-    console.log("name variable: ", filters.name);
-    console.log("minEmployees variable: ", filters.minEmployees);
-    console.log("maxEmployees variable: ", filters.maxEmployees);
-    console.log("---------------------------------------")
-    console.log("queries object (remaining): ", queries)
+  } else {
+    // Branches to this if there are no keys at all.
+    return false;
+  }
     
     // If we have both a minEmployees key and maxEmployees key, we have to make sure
     // that minEmployees is not greater than maxEmployees
-    if (minEmployees && maxEmployees && minEmployees > maxEmployees) {
+    if (filters.minEmployees && filters.maxEmployees && filters.minEmployees > filters.maxEmployees) {
       throw new BadRequestError("Minimum employees cannot exceed maximum employees");
     }
 

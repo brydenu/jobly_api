@@ -19,19 +19,8 @@ function authenticateJWT(req, res, next) {
   try {
     const authHeader = req.headers && req.headers.authorization;
     if (authHeader) {
-      const token = authHeader.replace(/^[Bb]earer /, "").trim();
-      console.log("==============================================================".red)
-      console.log("req.headers: ".blue, req.headers)
-      console.log("req.headers.authorization: ".blue, req.headers.authorization)
-      console.log("authHeader: ".blue, authHeader)
-      console.log("token: ".blue, token)
-      console.log("==============================================================".red)
-      
+      const token = authHeader.replace(/^[Bb]earer /, "").trim();  
       res.locals.user = jwt.verify(token, SECRET_KEY);
-
-      console.log("==============================================================".green)
-      console.log("res.locals: ".blue, res.locals)
-      console.log("==============================================================".green)
     }
     return next();
   } catch (err) {

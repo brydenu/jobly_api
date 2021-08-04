@@ -1,5 +1,7 @@
-const {validateQueries} = require("./helpers");
+const { validateQueries } = require("./helpers");
 const { BadRequestError } = require("../expressError");
+
+const compLoc = "companies";
 
 describe("validateQueries works if using proper queries in any combination", function() {
     test("works with all 3 filters", function() {
@@ -8,12 +10,15 @@ describe("validateQueries works if using proper queries in any combination", fun
             minEmployees: "1",
             maxEmployees: "50"
         }
-        const test = validateQueries(testQueries);
-        expect(test).toEqual({
-            name: "testName",
-            minEmployees: 1,
-            maxEmployees: 50
-        })
+        const expected = {
+            "maxEmployees": 50,
+            "minEmployees": 1,
+            "name": "testName",
+        }
+        const test = validateQueries(testQueries, compLoc);
+        console.log(expected);
+        console.log(test);
+        expect(test).toEqual(expected);
     })
 
     test("works with name and minEmployees", function() {
@@ -21,34 +26,22 @@ describe("validateQueries works if using proper queries in any combination", fun
             name: "testName",
             minEmployees: "1"
         }
-        const test = validateQueries(testQueries);
+        const test = validateQueries(testQueries, compLoc);
         expect(test).toEqual({
-            name: "testName",
-            minEmployees: 1
-        })
-    })
-
-    test("works with name and maxEmployees", function() {
-        const testQueries = {
-            name: "testName",
-            maxEmployees: "50"
-        }
-        const test = validateQueries(testQueries);
-        expect(test).toEqual({
-            name: "testName",
-            maxEmployees: 50
+            "minEmployees": 1,
+            "name": "testName",
         })
     })
 
     test("works with minEmployees and maxEmployees", function() {
         const testQueries = {
-            minEmployees: "1",
-            maxEmployees: "50"
+            maxEmployees: "50",
+            minEmployees: "1"
         }
-        const test = validateQueries(testQueries);
+        const test = validateQueries(testQueries, compLoc);
         expect(test).toEqual({
-            minEmployees: 1,
-            maxEmployees: 50
+            "maxEmployees": 50,
+            "minEmployees": 1,
         })
     })
 
@@ -56,9 +49,9 @@ describe("validateQueries works if using proper queries in any combination", fun
         const testQueries = {
             name: "testName"
         }
-        const test = validateQueries(testQueries);
+        const test = validateQueries(testQueries, compLoc);
         expect(test).toEqual({
-            name: "testName"
+            "name": "testName",
         })
     })
 
@@ -66,9 +59,9 @@ describe("validateQueries works if using proper queries in any combination", fun
         const testQueries = {
             minEmployees: "1"
         }
-        const test = validateQueries(testQueries);
+        const test = validateQueries(testQueries, compLoc);
         expect(test).toEqual({
-            minEmployees: 1
+            "minEmployees": 1,
         })
     })
 
@@ -76,15 +69,15 @@ describe("validateQueries works if using proper queries in any combination", fun
         const testQueries = {
             maxEmployees: "50"
         }
-        const test = validateQueries(testQueries);
+        const test = validateQueries(testQueries, compLoc);
         expect(test).toEqual({
-            maxEmployees: 50
+            "maxEmployees": 50,
         })
     })
 
     test("returns false with no queries", function() {
         const testQueries = {};
-        const test = validateQueries(testQueries);
+        const test = validateQueries(testQueries, compLoc);
         expect(test).toEqual(false)
     })
 
@@ -97,7 +90,7 @@ describe("validateQueries doesn't work when using improper queries", function() 
             maxEmployees: "1"
         }
         try {
-            const test = validateQueries(testQueries);
+            const test = validateQueries(testQueries, compLoc);
             fail();
         } catch(err) {
             expect(err instanceof BadRequestError).toBeTruthy();
@@ -109,7 +102,7 @@ describe("validateQueries doesn't work when using improper queries", function() 
             minEmployees: "definitely not a number"
         }
         try {
-            const test = validateQueries(testQueries);
+            const test = validateQueries(testQueries, compLoc);
             fail();
         } catch(err) {
             expect(err instanceof BadRequestError).toBeTruthy();
@@ -121,7 +114,7 @@ describe("validateQueries doesn't work when using improper queries", function() 
             maxEmployees: "definitely not a number"
         }
         try {
-            const test = validateQueries(testQueries);
+            const test = validateQueries(testQueries, compLoc);
             fail();
         } catch(err) {
             expect(err instanceof BadRequestError).toBeTruthy();
@@ -135,7 +128,7 @@ describe("validateQueries doesn't work when using improper queries", function() 
             likes_dogs: true
         }
         try {
-            const test = validateQueries(testQueries);
+            const test = validateQueries(testQueries, compLoc);
             fail();
         } catch(err) {
             expect(err instanceof BadRequestError).toBeTruthy();
@@ -150,7 +143,7 @@ describe("validateQueries doesn't work when using improper queries", function() 
             location: "Seattle"
         }
         try {
-            const test = validateQueries(testQueries);
+            const test = validateQueries(testQueries, compLoc);
             fail();
         } catch(err) {
             expect(err instanceof BadRequestError).toBeTruthy();

@@ -15,15 +15,15 @@ class Job {
    *
    * */
 
-  static async create({ title, salary, equity, company_handle }) {
+  static async create({ title, companyHandle, salary, equity }) {
       const res = await db.query(
           `INSERT INTO jobs
-          (title, salary, equity, company_handle)
-          VALUES ($1, $2, $3, $4, $5)
+          (title, company_handle, salary, equity)
+          VALUES ($1, $2, $3, $4)
           RETURNING id, title, salary, equity, company_handle AS companyHandle`,
-          [title, salary, equity, company_handle]
+          [title, companyHandle, salary, equity]
       );
-      const job = result.rows[0];
+      const job = res.rows[0];
 
       return job;
   }
@@ -33,7 +33,7 @@ class Job {
    * Returns [{id, title, salary, equity, company_handle}, ...]
    */
 
-  static findAll() {
+  static async findAll() {
       const jobsRes = await db.query(
           `SELECT id, title, salary, equity, company_handle
           FROM jobs
@@ -57,14 +57,12 @@ class Job {
       let toConcat;
       if (filter == "title") {
         toConcat = `${filter} ILIKE '%${queries[filter]}%'`
-      } else if (filter == "salary") {
+      } else if (filter == "minSalary") {
         toConcat = `salary >= ${queries[filter]}`
-      } else if (filter == "equity") {
-        toConcat = `equity <= ${queries[filter]}`
-      } else if (filter == "company_handle") {
-          toConcat = `company_handle ILIKE '%${queries[filter]}%'`
-      } else if (filter == "id") {
-          toConcat = `id = ${queries[filter]}`
+      } else if (filter == "hasEquity") {
+        toConcat = `equity ${queries[filter]}`
+      } else if (filter == "companyHandle") {
+        toConcat = `company_handle ILIKE '%${queries[filter]}%'`
       }
       whereQuery = whereQuery.concat(toConcat);
 
@@ -85,7 +83,6 @@ class Job {
     WHERE ${whereQuery}
     ORDER BY id`;
 
-    console.log(query)
     const jobsRes = await db.query(query)
 
     return jobsRes.rows;
@@ -97,7 +94,7 @@ class Job {
    **/
   
   static async get(id) {
-      const jobsRes = await db.query(
+      const jobRes = await db.query(
           `SELECT id, title, salary, equity, company_handle AS company_handle
           FROM jobs
           WHERE id = $1`, [id]);

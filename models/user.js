@@ -112,7 +112,41 @@ class User {
            ORDER BY username`,
     );
 
-    return result.rows;
+    return this.findApplications(result.rows);
+  }
+
+  /** Given a user object (or list of user objects), 
+   * return same user(s) with a new property of "jobs"
+   * 
+   * Accepts an array of users (must come in an array, even if it's just one user).
+   * 
+   * This property is an array of all of the jobs a user has applied for.
+   * 
+   * Returns new user object.
+   */
+
+  static async findApplications(userRows) {
+
+    const usersWithApps = [];
+    for (let user of userRows) {
+
+      const res = await db.query(`
+            SELECT job_id
+            FROM applications
+            WHERE username = $1`, [user.username]
+      );
+
+      const jobs = [];
+      for (let jobObj of res.rows) {
+        jobs.push(jobObj.job_id);
+      }
+
+      usersWithApps.push({ ...user, jobs })
+    }
+    if (usersWithApps.length == 1) {
+      return usersWithApps[0];
+    }
+    return usersWithApps;
   }
 
   /** Given a username, return data about user.
@@ -135,11 +169,35 @@ class User {
         [username],
     );
 
-    const user = userRes.rows[0];
+    const user = userRes.rows;
 
-    if (!user) throw new NotFoundError(`No user: ${username}`);
+    if (!user[0]) throw new NotFoundError(`No user: ${username}`);
 
-    return user;
+    return this.findApplications(user);
+  }
+
+  /** Apply to a job from the job table
+   * 
+   * 
+   * 
+   * 
+   */
+
+  static async apply(username, jobId) {
+      const appRes = await db.query(`
+            INSERT INTO applications
+            (username, job_id)
+            VALUES
+            ($1, $2)
+            RETURNING username, job_id`, [username, jobId]
+      );
+
+    const application = appRes.rows[0];
+    
+    if (!application) throw new NotFoundError("Username or jobId not found.");
+
+
+    return { applied: application.job_id };
   }
 
   /** Update user data with `data`.

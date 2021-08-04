@@ -26,21 +26,13 @@ const { BadRequestError } = require("../expressError");
 
 
 function sqlForPartialUpdate(dataToUpdate, jsToSql) {
-  console.log("START OF sqlForPartialUpdate(dataToUpdate, jsToSql".red);
   const keys = Object.keys(dataToUpdate);
   if (keys.length === 0) throw new BadRequestError("No data");
-  console.log("@@@@@@".blue, "@@@@@@".red, "@@@@@@".green, "@@@@@@".yellow, "@@@@@@".blue)
-  console.log("keys: ".yellow, keys);
   
   // {firstName: 'Aliya', age: 32} => ['"first_name"=$1', '"age"=$2']
   const cols = keys.map((colName, idx) =>
   `"${jsToSql[colName] || colName}"=$${idx + 1}`,
   );
-  console.log("cols: ".yellow, cols);
-  console.log(`setCols (cols.join(", ")): `.yellow, cols.join(", "));
-  console.log(`values (Object.values(dataToUpdate)): `.yellow, Object.values(dataToUpdate));
-  
-  console.log("@@@@@@".blue, "@@@@@@".red, "@@@@@@".green, "@@@@@@".yellow, "@@@@@@".blue)
   return {
     setCols: cols.join(", "),
     values: Object.values(dataToUpdate),

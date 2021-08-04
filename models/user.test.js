@@ -117,6 +117,7 @@ describe("findAll", function () {
         lastName: "U1L",
         email: "u1@email.com",
         isAdmin: false,
+        jobs: [],
       },
       {
         username: "u2",
@@ -124,10 +125,76 @@ describe("findAll", function () {
         lastName: "U2L",
         email: "u2@email.com",
         isAdmin: false,
+        jobs: [],
       },
     ]);
   });
 });
+
+/************************************** findApplications */
+
+describe("findApplications", function() {
+  test("works with array of multiple users", async function () {
+    const users = [
+      {
+        username: "u1",
+        firstName: "U1F",
+        lastName: "U1L",
+        email: "u1@email.com",
+        isAdmin: false,
+      },
+      {
+        username: "u2",
+        firstName: "U2F",
+        lastName: "U2L",
+        email: "u2@email.com",
+        isAdmin: false,
+      }
+    ];
+
+    const usersWithApps = await User.findApplications(users);
+
+    expect(usersWithApps).toEqual([{
+      username: "u1",
+      firstName: "U1F",
+      lastName: "U1L",
+      email: "u1@email.com",
+      isAdmin: false,
+      jobs: [],
+    },
+    {
+      username: "u2",
+      firstName: "U2F",
+      lastName: "U2L",
+      email: "u2@email.com",
+      isAdmin: false,
+      jobs: [],
+    }])
+  })
+
+  test("works with one user (still in array)", async function () {
+    const users = [
+      {
+        username: "u1",
+        firstName: "U1F",
+        lastName: "U1L",
+        email: "u1@email.com",
+        isAdmin: false,
+      }
+    ];
+
+    const usersWithApps = await User.findApplications(users);
+
+    expect(usersWithApps).toEqual({
+      username: "u1",
+      firstName: "U1F",
+      lastName: "U1L",
+      email: "u1@email.com",
+      isAdmin: false,
+      jobs: [],
+    })
+  })
+})
 
 /************************************** get */
 
@@ -140,6 +207,7 @@ describe("get", function () {
       lastName: "U1L",
       email: "u1@email.com",
       isAdmin: false,
+      jobs: [],
     });
   });
 
